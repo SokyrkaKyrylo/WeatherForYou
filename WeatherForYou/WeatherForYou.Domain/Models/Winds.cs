@@ -1,0 +1,3 @@
+﻿namespace WeatherForYou.Domain.Models
+{   
+}

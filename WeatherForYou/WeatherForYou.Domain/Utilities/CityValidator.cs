@@ -1,4 +1,4 @@
-﻿namespace WeatherForYou.Domain.Concrete.Services
+﻿namespace WeatherForYou.Domain.Utilities
 {
     internal class CityValidator
     {

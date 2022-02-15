@@ -11,7 +11,7 @@ using WeatherForYou.Domain.Contexts;
 
 namespace WeatherForYou.Domain.Migrations
 {
-    [DbContext(typeof(MeteorologyContext))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20220207211735_Add-Temperature-To-Day")]
     partial class AddTemperatureToDay
     {

@@ -11,12 +11,14 @@ builder.Services.AddControllersWithViews();
 
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<MeteorologyContext>(options =>
+builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly(typeof(MeteorologyContext).Assembly.FullName)));
-builder.Services.AddScoped<IRepository<MeteorologyData>, MetereologyRepository>();
-builder.Services.AddScoped<IDataLoader, ExcelDataLoader>();
+        b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)),
+        ServiceLifetime.Singleton);
+builder.Services.AddSingleton<IRepository<MeteorologyData>, MetereologyRepository>();
+builder.Services.AddSingleton<IDataLoader, ExcelDataLoader>();
+builder.Services.AddSingleton<IDataProcessor, DataProcessor>();
 
 var app = builder.Build();
 app.UseHttpsRedirection();

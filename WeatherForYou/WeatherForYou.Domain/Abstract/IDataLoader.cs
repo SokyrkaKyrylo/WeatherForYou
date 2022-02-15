@@ -1,9 +1,10 @@
-﻿using WeatherForYou.Domain.Dtos;
+﻿
+using WeatherForYou.Domain.Models;
 
 namespace WeatherForYou.Domain.Abstract;
 public interface IDataLoader
 {
-    IEnumerable<MeteorologyDataDto> GetDataFromDirectory(string[] path);
-    IEnumerable<MeteorologyDataDto> GetDataFromFile(string path);
+    IEnumerable<MeteorologyData> GetDataFromDirectory(string[] path);
+    IEnumerable<MeteorologyData> GetDataFromFile(string path);
     IEnumerable<string> CheckForANewFiles();
 }

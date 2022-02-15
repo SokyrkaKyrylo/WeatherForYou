@@ -9,26 +9,33 @@ namespace WeatherForYou.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IRepository<MeteorologyData> _repository;
-        private readonly IDataLoader _dataLoader;
 
-        public HomeController(ILogger<HomeController> logger, IRepository<MeteorologyData> repository, IDataLoader dataLoader)
+        public HomeController(ILogger<HomeController> logger, IRepository<MeteorologyData> repository, IDataLoader dataLoader, IDataProcessor processor)
         {
             _logger = logger;
             _repository = repository;
             _dataLoader = dataLoader;
+            _dataProcessor = processor;
         }
+
+        private readonly ILogger<HomeController> _logger;
+        private readonly IRepository<MeteorologyData> _repository;
+        private readonly IDataLoader _dataLoader;
+        private readonly IDataProcessor _dataProcessor;
 
         public IActionResult Index()
         {
-            
-            var directories = _dataLoader.CheckForANewFiles();
-            if (directories.Count() > 0)
-            {
-                var resultList = _dataLoader.GetDataFromDirectory(directories.ToArray());
-                _repository.AddRange(resultList);
-            }
+            //var directories = _dataLoader.CheckForANewFiles();
+            //if (directories.Count() > 0)
+            //{
+            //    var resultList = _dataLoader.GetDataFromFile("D:\\Projects\\WeatherForYou\\Datasets\\київ\\2012-2.xlsx");
+            //    _repository.AddRange(resultList);
+            //    _repository.Save();
+            //}
+            //var result = _repository.CheckIfDataIsValid();
+            //if (!result.Status)
+            //    _dataProcessor.RestoreDataLinearInterpolationAsync(result.InvalidMeteorologiesData);
+
             return View();
         }
 

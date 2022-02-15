@@ -1,4 +1,6 @@
-﻿namespace WeatherForYou.Domain.Abstract;
+﻿using static WeatherForYou.Domain.Concrete.Repositories.MetereologyRepository;
+
+namespace WeatherForYou.Domain.Abstract;
 public interface IRepository<T> where T : class
 {
     Task<List<T>> GetAllAsync();
@@ -7,5 +9,6 @@ public interface IRepository<T> where T : class
     void AddRange(IEnumerable<T> entities);
     void Update(T entity);
     void Delete(int id);
-    void Save();
+    Task<Task> Save();
+    ValidationInformation CheckIfDataIsValid();
 }

@@ -12,8 +12,8 @@ using WeatherForYou.Domain.Contexts;
 namespace WeatherForYou.Domain.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20220207203322_ChangeModelLogic")]
-    partial class ChangeModelLogic
+    [Migration("20220214195425_UpdateModelsForBetterOneToMany")]
+    partial class UpdateModelsForBetterOneToMany
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,7 @@ namespace WeatherForYou.Domain.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("WeatherForYou.Domain.Models.Day", b =>
+            modelBuilder.Entity("WeatherForYou.Domain.Models.City", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,9 +32,12 @@ namespace WeatherForYou.Domain.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Days");
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("WeatherForYou.Domain.Models.MeteorologyData", b =>
@@ -45,7 +48,10 @@ namespace WeatherForYou.Domain.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("DayId")
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Temperature")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
@@ -59,21 +65,25 @@ namespace WeatherForYou.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DayId");
+                    b.HasIndex("CityId");
 
                     b.ToTable("Meteorologies");
                 });
 
             modelBuilder.Entity("WeatherForYou.Domain.Models.MeteorologyData", b =>
                 {
-                    b.HasOne("WeatherForYou.Domain.Models.Day", null)
-                        .WithMany("MeteorologyData")
-                        .HasForeignKey("DayId");
+                    b.HasOne("WeatherForYou.Domain.Models.City", "City")
+                        .WithMany("MeteorologyDatas")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
-            modelBuilder.Entity("WeatherForYou.Domain.Models.Day", b =>
+            modelBuilder.Entity("WeatherForYou.Domain.Models.City", b =>
                 {
-                    b.Navigation("MeteorologyData");
+                    b.Navigation("MeteorologyDatas");
                 });
 #pragma warning restore 612, 618
         }

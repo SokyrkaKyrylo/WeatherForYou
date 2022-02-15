@@ -11,7 +11,7 @@ using WeatherForYou.Domain.Contexts;
 
 namespace WeatherForYou.Domain.Migrations
 {
-    [DbContext(typeof(MeteorologyContext))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20220209222320_ChangeModels")]
     partial class ChangeModels
     {

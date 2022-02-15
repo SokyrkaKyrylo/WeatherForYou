@@ -10,7 +10,7 @@ using WeatherForYou.Domain.Contexts;
 
 namespace WeatherForYou.Domain.Migrations
 {
-    [DbContext(typeof(MeteorologyContext))]
+    [DbContext(typeof(DatabaseContext))]
     partial class MeteorologyContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -31,7 +31,6 @@ namespace WeatherForYou.Domain.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -50,7 +49,7 @@ namespace WeatherForYou.Domain.Migrations
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Temperature")
+                    b.Property<int?>("Temperature")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Time")
@@ -59,7 +58,7 @@ namespace WeatherForYou.Domain.Migrations
                     b.Property<string>("WindDirection")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("WindSpeed")
+                    b.Property<double?>("WindSpeed")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
@@ -72,12 +71,17 @@ namespace WeatherForYou.Domain.Migrations
             modelBuilder.Entity("WeatherForYou.Domain.Models.MeteorologyData", b =>
                 {
                     b.HasOne("WeatherForYou.Domain.Models.City", "City")
-                        .WithMany()
+                        .WithMany("MeteorologyDatas")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("City");
+                });
+
+            modelBuilder.Entity("WeatherForYou.Domain.Models.City", b =>
+                {
+                    b.Navigation("MeteorologyDatas");
                 });
 #pragma warning restore 612, 618
         }

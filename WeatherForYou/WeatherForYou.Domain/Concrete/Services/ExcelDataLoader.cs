@@ -1,14 +1,19 @@
 ﻿using System.Text.RegularExpressions;
 using OfficeOpenXml;
 using WeatherForYou.Domain.Abstract;
-using WeatherForYou.Domain.Dtos;
 using WeatherForYou.Domain.Models;
+using WeatherForYou.Domain.Utilities;
 
 namespace WeatherForYou.Domain.Concrete.Services;
 public class ExcelDataLoader : IDataLoader
 {
-    private const string _newFilesDirectory = "D:\\Projects\\WeatherForYou\\Datasets";
+    public const string _newFilesDirectory = "D:\\Projects\\WeatherForYou\\Datasets";
+    private readonly IRepository<MeteorologyData> _database;
 
+    public ExcelDataLoader(IRepository<MeteorologyData> database)
+    {
+        _database = database;
+    }
     public IEnumerable<string> CheckForANewFiles()
     {
         var directories = Directory.GetDirectories(_newFilesDirectory);
@@ -19,9 +24,9 @@ public class ExcelDataLoader : IDataLoader
         return directories.Where(d => CityValidator.ValidateCityName(d.Split("\\")[^1])).ToList();
     }
 
-    public IEnumerable<MeteorologyDataDto> GetDataFromDirectory(string[] directoryPathes)
+    public IEnumerable<MeteorologyData> GetDataFromDirectory(string[] directoryPathes)
     {
-        IEnumerable<MeteorologyDataDto> result = new List<MeteorologyDataDto>();
+        IEnumerable<MeteorologyData> result = new List<MeteorologyData>();
         foreach (var directory in directoryPathes)
         {
             var files = Directory.GetFiles(directory, "*.xlsx");
@@ -29,15 +34,15 @@ public class ExcelDataLoader : IDataLoader
             {
                 if (Regex.Match(new FileInfo(file).Name, "^20[0-2][0-9]-([0-9]|1[0-2])\\.xlsx$").Success)
                     result = result.Concat(GetDataFromFile(file));
-                File.Delete(file);
+                //File.Delete(file);
             }
         }
         return result;
     }
 
-    public IEnumerable<MeteorologyDataDto> GetDataFromFile(string filePath)
+    public IEnumerable<MeteorologyData> GetDataFromFile(string filePath)
     {
-        var days = new List<MeteorologyDataDto>();
+        var days = new List<MeteorologyData>();
         using (var excelDoc = new ExcelPackage(new FileInfo(filePath)))
         {
             var sheet = excelDoc.Workbook.Worksheets.FirstOrDefault();
@@ -45,21 +50,24 @@ public class ExcelDataLoader : IDataLoader
             if (sheet == null)
                 return null;
 
+            var city = new City { Name = filePath.Split("\\")[^2] };
             if (CheckIfColumnsIsCorrect(sheet))
             {
                 int row = 2;
                 while (sheet.Cells[$"A{row}"].Value != null)
-                {                   
-                    days.Add(new MeteorologyDataDto
+                {
+                    days.Add(new MeteorologyData
                     {
+                        City = city,
                         Time = GetDateTime(
-                            sheet.Name,
-                            Convert.ToInt32(sheet.Cells[$"A{row}"].Value),
-                            (DateTime)sheet.Cells[$"B{row}"].Value),
+                                sheet.Name,
+                                Convert.ToInt32(sheet.Cells[$"A{row}"].Value),
+                                (DateTime)sheet.Cells[$"B{row}"].Value),
                         Temperature = Convert.ToInt32(sheet.Cells[$"C{row}"].Value),
-                        WindDirection = (string)sheet.Cells[$"D{row}"].Value,
+                        WindDirection = TranslationHelper
+                            .TranslateWindDirrectionName((string)sheet.Cells[$"D{row}"].Value),
                         WindSpeed = (double)sheet.Cells[$"E{row}"].Value
-                    });
+                    }); 
                     row++;
                 }
             }
